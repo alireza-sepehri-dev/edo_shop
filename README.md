@@ -1,7 +1,5 @@
 # Edu Shop (LMS + Online Store)
-
-پروژه ترکیبی سیستم مدیریت دوره‌های آموزشی (LMS ساده)
- + فروشگاه فایل‌های آموزشی.
+پروژه ترکیبی سیستم مدیریت دوره‌های آموزشی (LMS ساده) + فروشگاه فایل‌های آموزشی.
 
 
 ## Features
@@ -11,28 +9,21 @@
 - داشبورد دانشجو و استاد
 - فرانت‌اند مدرن با React/Vite
 
+
+
 ## Project Structure
 - `backend/` → Django apps (users, lessons, cart, orders, etc.)
 - `frontend/` → React + Vite
 - `.venv/` → Python virtual environment
 
-## Installation
-1. Clone the repository
-2. Create virtual environment and install dependencies:
-   ```bash
-   pip install -r requirements.txt
+## Clone the project 
+```bash
+git clone https://github.com/alireza-sepehri-dev/edo_shop.git
+cd edo_shop
 
-### Backend
-   ```bash
-   git clone <repo-url>
-   cd edu_shop
-   python3 -m venv .venv
-   source .venv/bin/activate # یا در ویندوز: .venv\Scripts\activate
-   pip install -r requirements.txt
-
-### Frontend
-   cd frontend
-   npm install
+ python3 -m venv .venv
+ source .venv/bin/activate  # یا در ویندوز: .venv\Scripts\activate
+ pip install -r requirements.txt
 
 ## Run
 
