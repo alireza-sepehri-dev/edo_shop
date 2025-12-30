@@ -1,0 +1,14 @@
+/* loading animate dots */
+.dot {
+  display: inline-block;
+  animation: bounce 1s infinite;
+}
+
+.dot.delay-0 { animation-delay: 0s; }
+.dot.delay-200 { animation-delay: 0.2s; }
+.dot.delay-400 { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}

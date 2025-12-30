@@ -1,12 +1,7 @@
-
+import RegisterForm from './pages/RegisterForm.jsx'
 
 function App() {
-
-  return (
-    <>
-
-    </>
-  )
+  return <RegisterForm />
 }
 
 export default App
