@@ -5,16 +5,18 @@ import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 import { LoadingDots } from '../components/Loading'
 
 export default function RegisterForm() {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
+  const [formPass, setformPass] = useState({
     password: '',
+    password_confirm: '',
   })
+  const [emailValue, setEmailValue] = useState('')
   const [code, setCode] = useState('')
   const [message, setMessage] = useState('')
   const [cooldown, setCooldown] = useState(0) // زمان باقی‌مانده برحسب ثانیه
   const [loading, setLoading] = useState(false)
-  const [showPassword, setShowPassword] = useState(false) // کنترل نمایش رمز
+  const [showPass, setshowPass] = useState(false) // کنترل نمایش رمز  
+  const [showPass2, setshowPass2] = useState(false) // کنترل نمایش تکرار رمز
+
 
   const isSuccessMessage = message => message.includes('✅')
   const timecooldown = 120 // مهلت زمان ثبت نام بر حسب ثانیه
@@ -49,8 +51,8 @@ export default function RegisterForm() {
   }, [])
 
 
-  const handleChange = e => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+  const handlePass = e => {
+    setformPass({ ...formPass, [e.target.name]: e.target.value })
   }
 
 
@@ -58,10 +60,11 @@ export default function RegisterForm() {
     e.preventDefault()
     setLoading(true)
     try {
-      await api.post("users/request-verification-code/", {
-        email: formData.email,
+      const res = await api.post("users/request-verification-code/", {
+        email: emailValue,
       })
-      setMessage('کد تأیید ارسال شد ✅')
+      const backendMessage = res.data.message || 'کد تأیید به ایمیل شما ارسال شد ✅'
+      setMessage(backendMessage)
 
       // شروع شمارنده
       localStorage.setItem('codeSentAt', Date.now().toString())
@@ -77,17 +80,42 @@ export default function RegisterForm() {
         })
       }, 1000)
     } catch (err) {
-      const backendMessage = err.response?.data.error || 'ارسال کد ناموفق بود ❌'
+      const backendMessage = err.response?.data?.error || 'ارسال کد ناموفق بود لطفا دوباره تلاش کنید ❌'
       setMessage(backendMessage)
     } finally {
       setLoading(false)
     }
   }
 
-  // اعتبارسنجی رمز عبور
-  const isPasswordValid = password => {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/
-    return regex.test(password)
+  const handleSubmit = async e => {
+    e.preventDefault()
+    setLoading(true)
+    try {
+      const res = await api.post("users/register/", {
+        email: emailValue,
+        code: code,
+        password: formPass.password,
+        password_confirm: formPass.password_confirm,
+      })
+      const backendMessage = res.data.message || 'ثبت‌نام با موفقیت انجام شد ✅'
+      setMessage(backendMessage)
+      // setTimeout(() => navigate('/login'), 1500)
+    } catch (err) {
+      const data = err.response?.data
+      let backendMessage = 'خطا در ثبت‌نام ❌'
+
+      if (data) {
+        if (data.error) backendMessage = data.error  // پیغام خطاهای ویو
+        else {
+          const firstError = data[Object.keys(data)[0]]?.[0] // پیغام خطاهای سریالایزر
+          backendMessage = firstError || backendMessage
+        }
+      }
+      setMessage(backendMessage)
+    } finally {
+      setLoading(false)
+      setCode('')
+    }
   }
 
   return (
@@ -98,61 +126,80 @@ export default function RegisterForm() {
       <div className="container mx-auto flex flex-col flex-1">
         <div className="main-rounded-page flex-1 mt-10 rounded-t-[50px]">
 
-          <h2 className="text-xl font-light text-center my-12 text-lime-600 dark:text-lime-800">ایجاد حساب در یک دقیقه</h2>
+          <h2 className="text-xl font-light text-center my-12 text-lime-600 dark:text-[#88a760]">ایجاد حساب در یک دقیقه</h2>
           <div className='box-style pt-12 px-6 max-w-87.5 mx-auto border-2 rounded-md relative'>
 
-            <form onSubmit={handleEmailSubmit}>
+            <form onSubmit={cooldown === 0 ? handleEmailSubmit : handleSubmit}>
               {cooldown === 0 ? (
                 <input
                   type="email"
-                  name='email'
-                  value={formData.email}
-                  onChange={handleChange}
+                  value={emailValue}
+                  onChange={e => setEmailValue(e.target.value)}
                   placeholder="ایمیل"
-                  required
                   className="w-full p-2 border-b-2 border-b-stone-200 dark:border-b-stone-400 mb-12 placeholder:text-sm placeholder:text-stone-300 focus:outline-none focus:ring-0 autofill:bg-transparent focus:bg-transparent active:bg-transparent"
                 />
               ) : (
                 <>
+                  <div>
+                    <p className='text-sm text-stone-300'>نام کاربری/ایمیل</p>
+                    <input
+                      type="text"
+                      value={emailValue}
+                      disabled
+                      className="w-full p-2 border-0 text-gray-400 text-end mb-8"
+                    />
+                  </div>
                   <div className='flex justify-between items-end gap-3 mb-16'>
                     <input
                       type="text"
                       value={code}
                       onChange={e => setCode(e.target.value)}
-                      placeholder="کد تأیید" required
+                      placeholder="کد تأیید"
                       className="w-1/2 p-2 border-b-2 border-b-stone-200 dark:border-b-stone-400 placeholder:text-sm placeholder:text-stone-300 focus:outline-none focus:ring-0 autofill:bg-transparent focus:bg-transparent active:bg-transparent"
                     />
                     <p className='w-1/2 text-xs text-center text-gray-400'>
                       {cooldown > 0 && (`زمان باقیمانده : ${cooldown} ثانیه`)}
                     </p>
                   </div>
-                  <input
-                    type="text"
-                    name="username"
-                    value={formData.username}
-                    onChange={handleChange}
-                    placeholder="نام کاربری"
-                    className="w-full p-2 border-b-2 border-b-stone-200  dark:border-b-stone-400 mb-16 placeholder:text-sm placeholder:text-stone-300 focus:outline-none focus:ring-0 autofill:bg-transparent focus:bg-transparent active:bg-transparent"
-                    required />
                   <div className='relative mb-16'>
                     <span
-                      onClick={() => setShowPassword(!showPassword)}
+                      onClick={() => setshowPass(!showPass)}
                       className="absolute left-2 top-2 cursor-pointer text-gray-500 z-10"
                     >
-                      {showPassword ? (
+                      {showPass ? (
                         <EyeSlashIcon className="h-5 w-5" />
                       ) : (
                         <EyeIcon className="h-5 w-5" />
                       )}
                     </span>
                     <input
-                      type={showPassword ? "text" : "password"}
+                      type={showPass ? "text" : "password"}
                       name="password"
-                      value={formData.password}
-                      onChange={handleChange}
+                      value={formPass.password}
+                      onChange={handlePass}
                       placeholder="رمز عبور"
                       className="w-full p-2 pl-10 border-b-2 border-b-stone-200  dark:border-b-stone-400 placeholder:text-sm placeholder:text-stone-300 focus:outline-none focus:ring-0 autofill:bg-transparent focus:bg-transparent active:bg-transparent"
-                      required />
+                    />
+                  </div>
+                  <div className='relative mb-16'>
+                    <span
+                      onClick={() => setshowPass2(!showPass2)}
+                      className="absolute left-2 top-2 cursor-pointer text-gray-500 z-10"
+                    >
+                      {showPass2 ? (
+                        <EyeSlashIcon className="h-5 w-5" />
+                      ) : (
+                        <EyeIcon className="h-5 w-5" />
+                      )}
+                    </span>
+                    <input
+                      type={showPass2 ? "text" : "password"}
+                      name="password_confirm"
+                      value={formPass.password_confirm}
+                      onChange={handlePass}
+                      placeholder="تکرار رمز عبور"
+                      className="w-full p-2 pl-10 border-b-2 border-b-stone-200  dark:border-b-stone-400 placeholder:text-sm placeholder:text-stone-300 focus:outline-none focus:ring-0 autofill:bg-transparent focus:bg-transparent active:bg-transparent"
+                    />
                   </div>
                 </>
               )}
@@ -160,7 +207,8 @@ export default function RegisterForm() {
                 <Link to="/" className='text-sm text-lime-500 dark:text-sky-300 self-end cursor-pointer'>حساب کاربری دارم</Link>
                 {cooldown === 0 ? (
                   <button type="submit"
-                    className='bg-neutral-400 w-30 text-white py-1.5 mb-2 rounded'>
+                    disabled={loading}
+                    className='bg-neutral-400 w-30 text-white py-1.5 mb-2 rounded cursor-pointer'>
                     {loading ? (
                       <span className="flex items-center justify-center">
                         در حال ارسال <LoadingDots />
@@ -169,7 +217,8 @@ export default function RegisterForm() {
                   </button>
                 ) : (
                   <button type="submit"
-                    className="bg-neutral-400 w-30 text-white py-1.5 rounded">
+                    disabled={loading}
+                    className="bg-neutral-400 w-30 text-white py-1.5 rounded cursor-pointer">
                     {loading ? (
                       <span className="flex items-center justify-center">
                         در حال ثبت نام <LoadingDots />
@@ -183,7 +232,7 @@ export default function RegisterForm() {
           </div>
 
           {message && (
-            <p className={`mt-3 text-center text-sm ${isSuccessMessage(message) ? 'text-green-600' : 'text-red-600'}`}>
+            <p className={`mt-3 text-center text-sm ${isSuccessMessage(message) ? 'text-green-600' : 'text-red-600 dark:text-red-400'}`}>
               {message}
             </p>
           )}
