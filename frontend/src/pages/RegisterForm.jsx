@@ -99,7 +99,7 @@ export default function RegisterForm() {
       })
       const backendMessage = res.data.message || 'ثبت‌نام با موفقیت انجام شد ✅'
       setMessage(backendMessage)
-      // setTimeout(() => navigate('/login'), 1500)
+      setTimeout(() => navigate('/login'), 1500)
     } catch (err) {
       const data = err.response?.data
       let backendMessage = 'خطا در ثبت‌نام ❌'
@@ -204,11 +204,11 @@ export default function RegisterForm() {
                 </>
               )}
               <div className='flex justify-between items-center mb-4'>
-                <Link to="/" className='text-sm text-lime-500 dark:text-sky-300 self-end cursor-pointer'>حساب کاربری دارم</Link>
+                <Link to="/" className='text-sm self-end cursor-pointer text-[#c6dfa1] dark:text-gray-400 hover:text-lime-500 dark:hover:text-gray-300'>حساب کاربری دارم</Link>
                 {cooldown === 0 ? (
                   <button type="submit"
                     disabled={loading}
-                    className='bg-neutral-400 w-30 text-white py-1.5 mb-2 rounded cursor-pointer'>
+                    className={`w-30 text-white py-1.5 mb-2 rounded ${loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-neutral-400 cursor-pointer'}`}>
                     {loading ? (
                       <span className="flex items-center justify-center">
                         در حال ارسال <LoadingDots />
@@ -218,7 +218,7 @@ export default function RegisterForm() {
                 ) : (
                   <button type="submit"
                     disabled={loading}
-                    className="bg-neutral-400 w-30 text-white py-1.5 rounded cursor-pointer">
+                    className={`w-30 text-white py-1.5 rounded ${loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-neutral-400 cursor-pointer'}`}>
                     {loading ? (
                       <span className="flex items-center justify-center">
                         در حال ثبت نام <LoadingDots />
