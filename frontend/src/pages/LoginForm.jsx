@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import api from '../services/api'
 import { useAuthStore } from '../services/auth'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 import { LoadingDots } from '../components/Loading'
 
@@ -13,6 +13,7 @@ export default function LoginForm() {
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [showPass, setshowPass] = useState(false) // کنترل نمایش رمز  
+  const navigate = useNavigate()
 
   const isSuccessMessage = message => message.includes('✅')
 
@@ -38,8 +39,7 @@ export default function LoginForm() {
       localStorage.setItem('access', res.data.access)
       localStorage.setItem('refresh', res.data.refresh)
 
-      // setTimeout(() => navigate('/profile'), 1500)
-
+      navigate('/')
     } catch (err) {
       const data = err.response?.data
       let backendMessage = 'خطا در ورود ❌'

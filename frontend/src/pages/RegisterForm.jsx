@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import api from '../services/api'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline'
 import { LoadingDots } from '../components/Loading'
 
@@ -16,6 +16,7 @@ export default function RegisterForm() {
   const [loading, setLoading] = useState(false)
   const [showPass, setshowPass] = useState(false) // کنترل نمایش رمز  
   const [showPass2, setshowPass2] = useState(false) // کنترل نمایش تکرار رمز
+  const navigate = useNavigate()
 
 
   const isSuccessMessage = message => message.includes('✅')
