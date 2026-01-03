@@ -1,7 +1,17 @@
-import RegisterForm from './pages/RegisterForm.jsx'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+// import ProfilePage from './pages/ProfilePage'
+import RegisterForm from './pages/RegisterForm'
+import LoginForm from './pages/LoginForm'
 
 function App() {
-  return <RegisterForm />
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/register" element={<RegisterForm />} />
+        <Route path="/" element={<LoginForm />} />
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
 export default App
