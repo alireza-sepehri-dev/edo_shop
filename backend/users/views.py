@@ -4,8 +4,11 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from rest_framework import status
 from .models import EmailVerificationCode
-from .serializers import RegisterSerializer
+from .serializers import RegisterSerializer, LoginSerializer
 from .services import create_verification_code, send_verification_email
+from rest_framework_simplejwt.tokens import RefreshToken
+
+
 
 class RequestVerificationCodeView(APIView):
     def post(self, request):
@@ -61,3 +64,25 @@ class RegisterUserView(APIView):
             verification.delete()
 
         return Response({"message": "ثبت‌نام با موفقیت انجام شد ✅"}, status=status.HTTP_201_CREATED)
+    
+
+
+class LoginView(APIView):
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.validated_data['user']
+
+        # ساختن توکن JWT
+        refresh = RefreshToken.for_user(user)
+
+        return Response({
+            "refresh": str(refresh),
+            "access": str(refresh.access_token),
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "username": user.username,
+            }
+        }, status=status.HTTP_200_OK)

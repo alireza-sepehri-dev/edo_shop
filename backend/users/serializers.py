@@ -2,6 +2,7 @@ import re
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import EmailVerificationCode
+from django.contrib.auth import authenticate
 
 
 class EmailVerificationCodeSerializer(serializers.ModelSerializer):
@@ -45,10 +46,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
     def validate_password(self, value):
-        pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+        pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+=-])[A-Za-z\d!@#$%^&*()_+=-]{8,}$'
         if not re.match(pattern, value):
             raise serializers.ValidationError(
-                'رمز عبور باید حداقل ۸ کاراکتر و شامل حروف بزرگ، کوچک، عدد و کاراکتر خاص باشد.'
+                'رمز عبور باید حداقل ۸ کاراکتر و شامل حروف بزرگ، کوچک، عدد و کاراکترهای خاص باشد.'
             )
         return value
 
@@ -66,3 +67,23 @@ class RegisterSerializer(serializers.ModelSerializer):
             password=validated_data['password'],
         )
         return user
+    
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.EmailField(
+        error_messages={'required': 'نام کاربری(ایمیل) را وارد کنید'}
+    )
+    password = serializers.CharField(
+        write_only=True,
+        error_messages={'required': 'رمز عبور را وارد کنید'}
+    )
+
+    def validate(self, data):
+        user = authenticate(username=data['username'], password=data['password'])
+        if not user:
+            raise serializers.ValidationError("نام کاربری یا رمز عبور اشتباه است.")
+        if not user.is_active:
+            raise serializers.ValidationError("حساب کاربری شما غیرفعال است.")
+        data['user'] = user
+        return data
