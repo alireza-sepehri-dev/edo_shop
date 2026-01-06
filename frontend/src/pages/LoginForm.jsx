@@ -59,9 +59,6 @@ export default function LoginForm() {
 
   return (
     <>
-      <div className="bg-amber-700">
-        header
-      </div>
       <div className="container mx-auto flex flex-col flex-1">
         <div className="main-rounded-page flex-1 mt-10 rounded-t-[50px]">
 
@@ -125,9 +122,6 @@ export default function LoginForm() {
           </div>
         </div>
       </div >
-      <div className="bg-amber-300 h-6">
-        footer
-      </div>
     </>
   )
 }
