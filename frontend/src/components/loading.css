@@ -12,3 +12,46 @@
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
 }
+
+
+/* loading animate coffeemath */
+.loading-container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* حالت شیشه‌ای مات */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.2),
+    rgba(255, 255, 255, 0.05)
+  );
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.loader-graphic {
+  width: 300px;
+  height: 150px;
+}
+
+/* انیمیشن حرکت گرادیان روی متن */
+.animated-text {
+  animation: shine 3s linear infinite;
+}
+
+@keyframes shine {
+  0% {
+    fill: url(#loader_gradient);
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    fill: url(#loader_gradient);
+    opacity: 0.6;
+  }
+}
