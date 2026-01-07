@@ -1,7 +1,7 @@
 import re
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import EmailVerificationCode
+from .models import EmailVerificationCode, Profile
 from django.contrib.auth import authenticate
 
 
@@ -87,3 +87,40 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("حساب کاربری شما غیرفعال است.")
         data['user'] = user
         return data
+    
+
+class ProfileSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source="user.username", read_only=True) 
+    email = serializers.EmailField(source="user.email", read_only=True)
+    first_name = serializers.CharField(source="user.first_name", required=False, allow_blank=True, max_length=15)
+    last_name = serializers.CharField(source="user.last_name", required=False, allow_blank=True, max_length=15)
+    date_joined = serializers.DateTimeField(source="user.date_joined", read_only=True)
+    last_login = serializers.DateTimeField(source="user.last_login", read_only=True)
+
+    class Meta:
+        model = Profile
+        fields = (
+            "username",
+            "email",
+            "first_name",
+            "last_name",
+            "phone_number",
+            "city",
+            "bio",
+            "avatar",
+            "birth_date",
+            "school_name",
+            "education_status",
+            "major",
+            "grade",
+            "date_joined",
+            "last_login",
+        )
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop("user", {})
+        user = instance.user
+        user.first_name = user_data.get("first_name", user.first_name)
+        user.last_name = user_data.get("last_name", user.last_name)
+        user.save()
+        return super().update(instance, validated_data)

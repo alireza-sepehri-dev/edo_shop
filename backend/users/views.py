@@ -2,11 +2,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.db import transaction
-from rest_framework import status
+from rest_framework import status, generics, permissions
 from .models import EmailVerificationCode
-from .serializers import RegisterSerializer, LoginSerializer
+from .serializers import RegisterSerializer, LoginSerializer, ProfileSerializer
 from .services import create_verification_code, send_verification_email
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.utils import timezone
 
 
 
@@ -74,6 +75,10 @@ class LoginView(APIView):
 
         user = serializer.validated_data['user']
 
+        # ست کردن last_login 
+        user.last_login = timezone.now() 
+        user.save(update_fields=['last_login'])
+
         # ساختن توکن JWT
         refresh = RefreshToken.for_user(user)
 
@@ -84,5 +89,14 @@ class LoginView(APIView):
                 "id": user.id,
                 "email": user.email,
                 "username": user.username,
+                "last_login": user.last_login,
             }
         }, status=status.HTTP_200_OK)
+    
+
+class ProfileView(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ProfileSerializer
+
+    def get_object(self):
+        return self.request.user.profile
