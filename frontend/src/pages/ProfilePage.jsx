@@ -41,6 +41,11 @@ export default function ProfilePage() {
         fetchProfile();
     }, [])
 
+
+    if (!userData) {
+        return <div className='text-center mt-10'>اطلاعاتی یافت نشد!</div>
+    }
+
     return (
         <>
             <div className="container mx-auto flex flex-col flex-1">
